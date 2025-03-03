@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Backend (Node.js + Express.js)
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+
+  # Base de datos (MySQL)
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_prueba
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # Frontend (Vue.js)
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/app
+    #command: npm run dev
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
