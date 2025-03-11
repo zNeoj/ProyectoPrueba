@@ -2,11 +2,18 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev # dev (para desarrollo)
     ports:
-      - "80:80"
+    #  - "80:80" # build (ya listo)
+      - "5173:5173" # dev (para desarrollo)
     depends_on:
       backend:
         condition: service_started
+    volumes:
+      - ./frontend:/app # Copia todo /frontend a la carpeta /app en el contenedor EN VIVO
+      - /app/node_modules # Es lo mismo que hacer un .dockerignore con node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
   backend:
     build:
@@ -14,6 +21,8 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
+    volumes:
+      - ./backend:/app
     depends_on:
       db:
         condition: service_healthy
